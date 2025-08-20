@@ -1,0 +1,185 @@
+**ITERATIVE STEP 2: CHANNEL NAVIGATION CODE GENERATION & TESTING**
+
+You are a Senior Python Developer generating production-ready channel navigation methods for a TV schedule scraper using Playwright.
+
+**TARGET WEBSITE:** {target_url}
+**CHANNEL:** {channel_name}
+**CLASS NAME:** {class_name}
+**WEBSITE NAME:** {website_name}
+
+**MISSION:** Generate ONLY the channel-related methods that return static channel lists and handle channel switching based on intelligence data.
+
+**CHANNEL INTELLIGENCE DATA:**
+{current_task_intelligence}
+
+**HTML CONTENT:**
+{html_content}
+
+**BASE CLASS STRUCTURE:**
+Your generated class must inherit from IterativeTVScraper and include the login methods from Step 1:
+
+```python
+from typing import Dict, List
+from src.scrapers.iterative_tv_scraper import IterativeTVScraper, TVScraperError, ScraperConfig
+
+class {class_name}(IterativeTVScraper):
+    def __init__(self, config: ScraperConfig = None):
+        super().__init__("{website_name}", "{target_url}", config)
+    
+    # Login methods from Step 1 already exist
+    # Add channel methods below
+```
+
+**BROWSER ACCESS AVAILABLE:**
+- `self._page` - Playwright Page object (available during browser_session)
+- `self.base_url` - Website base URL
+- `self.logger` - Logger for debugging
+- `await self.save_page_dump(filename)` - Save current page as HTML
+
+**PLAYWRIGHT METHODS:**
+- `await self._page.goto(url)` - Navigate to URL
+- `await self._page.query_selector(selector)` - Find element
+- `await self._page.click(selector)` - Click element
+- `await self._page.wait_for_load_state()` - Wait for page load
+- `self._page.url` - Get current URL (property, no await)
+
+**ERROR HANDLING:**
+```python
+raise TVScraperError("Descriptive message", "ERROR_CODE", {{"context": "data"}})
+```
+
+**MANDATORY METHODS TO IMPLEMENT:**
+
+**1. `async def enumerate_channels(self) -> List[str]:`**
+- Return static list of channels found in intelligence data
+- NO web scraping needed - just return the list from intelligence
+- This is called once during setup to get available channels
+
+**2. `async def navigate_to_channel(self, channel_name: str) -> bool:`**
+- Navigate to the specified channel identifier
+- Return True if successful, False if failed
+- Handle single-channel (no switching) vs multi-channel (switching required)
+
+**IMPLEMENTATION LOGIC:**
+
+**Step 1: Analyze Intelligence Data**
+Look at the intelligence data to determine:
+- How many channels are available?
+- Is channel switching required?
+- What's the switching mechanism?
+
+**Step 2: Implement Based on Intelligence**
+
+**If Single Channel (No Switching Required):**
+```python
+async def enumerate_channels(self) -> List[str]:
+    """Return static channel list from intelligence"""
+    # Extract from intelligence data - no web scraping needed
+    return ["CHANNEL_NAME_FROM_INTELLIGENCE"]
+
+async def navigate_to_channel(self, channel_name: str) -> bool:
+    """No channel switching required - always return True"""
+    self.logger.info(f"Single channel website - no switching needed for {{channel_name}}")
+    return True
+```
+
+**If Multi-Channel (Switching Required):**
+```python
+async def enumerate_channels(self) -> List[str]:
+    """Return static channel list from intelligence"""
+    # Extract from intelligence data - no web scraping needed
+    channels_from_intelligence = [
+        "CHANNEL_1_FROM_INTELLIGENCE",
+        "CHANNEL_2_FROM_INTELLIGENCE", 
+        "CHANNEL_3_FROM_INTELLIGENCE"
+    ]
+    return channels_from_intelligence
+
+async def navigate_to_channel(self, channel_name: str) -> bool:
+    """Navigate to specific channel using intelligence switching patterns"""
+    try:
+        # Use intelligence switching mechanism
+        if "URL_BASED_SWITCHING" in intelligence:
+            # Direct URL navigation
+            channel_url = f"{{self.base_url}}/CHANNEL_PATH/{{channel_name}}"
+            await self._page.goto(channel_url)
+        else:
+            # Click-based switching
+            channel_selector = f"SELECTOR_FROM_INTELLIGENCE[data-channel='{{channel_name}}']"
+            await self._page.click(channel_selector)
+        
+        await self._page.wait_for_load_state()
+        
+        # Verify success using intelligence indicators
+        if "SUCCESS_VERIFICATION_METHOD" in self._page.url:
+            self.logger.info(f"Successfully switched to channel: {{channel_name}}")
+            return True
+        else:
+            self.logger.error(f"Channel switching verification failed for {{channel_name}}")
+            return False
+            
+    except Exception as e:
+        self.logger.error(f"Channel switching failed: {{str(e)}}")
+        raise TVScraperError(f"Failed to navigate to channel {{channel_name}}: {{str(e)}}", "CHANNEL_NAVIGATION_FAILED")
+```
+
+**INTELLIGENCE-BASED IMPLEMENTATION GUIDE:**
+
+**Use Intelligence Data For:**
+- `available_channels` - Static list to return in enumerate_channels()
+- `channel_switching_patterns.switching_mechanism` - URL vs click-based
+- `channel_switching_patterns.url_pattern_changes` - URL patterns for switching
+- `channel_switching_patterns.navigation_selectors` - Click selectors
+- `channel_switching_patterns.success_indicators` - How to verify success
+
+**Example Intelligence Analysis:**
+```python
+# If intelligence shows:
+# "available_channels": ["BBC One", "BBC Two", "BBC Three"]
+# "switching_mechanism": "click"
+# "channel_selector": ".channel-nav a[data-channel='{{channel_name}}']"
+
+async def enumerate_channels(self) -> List[str]:
+    return ["BBC One", "BBC Two", "BBC Three"]
+
+async def navigate_to_channel(self, channel_name: str) -> bool:
+    try:
+        selector = f".channel-nav a[data-channel='{{channel_name}}']"
+        await self._page.click(selector)
+        await self._page.wait_for_load_state()
+        return True
+    except Exception as e:
+        raise TVScraperError(f"Channel navigation failed: {{str(e)}}", "CHANNEL_NAV_FAILED")
+```
+
+**TESTING APPROACH:**
+Your generated code will be tested immediately:
+```python
+scraper = {class_name}(config)
+async with scraper.browser_session():
+    # Test channel enumeration
+    channels = await scraper.enumerate_channels()
+    
+    # Test channel navigation with first channel
+    success = await scraper.navigate_to_channel(channels[0])
+```
+
+**DELIVERABLE:**
+Complete Python class with:
+- `enumerate_channels()` - Returns static list from intelligence
+- `navigate_to_channel()` - Handles switching based on intelligence patterns
+- Proper error handling with TVScraperError
+- No redundant login handling (already handled in Step 1)
+
+**CRITICAL REQUIREMENTS:**
+- NO web scraping in enumerate_channels() - return static list from intelligence
+- Handle single vs multi-channel scenarios based on intelligence
+- Use exact selectors and patterns from intelligence data
+- Return True/False/Error for navigate_to_channel()
+- Code must work for 1000+ different TV websites with different channel structures
+- The code given here just treat it as example and inspiration like what you need to implement, but logic always be yours
+  please be realistic, add proper sleep/wait as required between the interaction
+- Be efficient and realistic for production use
+
+
+**DELIVERABLE:** Complete Python code only, no explanations, no markdown.

@@ -1,0 +1,38 @@
+**CODE FIX REQUEST - ATTEMPT {attempt_number}**
+
+You are a Senior Python Developer fixing a failed TV scraper method.
+
+**STEP:** {step_type}
+**ERROR TYPE:** {error_type}
+**ERROR MESSAGE:** {error_message}
+**PAGE URL:** {page_url}
+**PAGE TITLE:** {page_title}
+
+**CURRENT CODE THAT FAILED:**
+```python
+{current_code}
+```
+
+**ERROR DETAILS:**
+{error_details}
+
+**INTELLIGENCE DATA:**
+{intelligence_data}
+
+**MISSION:** Fix the code to handle this specific error. 
+
+**COMMON FIXES:**
+- Selector not found → Maybe you can use fallback selectors from intelligence
+- Timeout issues → Increase wait times or use different wait conditions
+- Element not clickable → Wait for element to be ready or use different selector
+- Login verification failed → Use different success indicators from intelligence
+- Navigation failed → Check URL patterns and navigation steps
+- Check for other issues and fix accordingly 
+
+**REQUIREMENTS:**
+1. Keep the same class structure and method signatures
+2. Use intelligence data for alternative selectors/approaches if we have issue realated to selectors
+3. Add better error handling for this specific failure
+4. Add debugging information (logging, page dumps)
+
+**DELIVERABLE:** Complete fixed Python class code only, no explanations, no markdown.

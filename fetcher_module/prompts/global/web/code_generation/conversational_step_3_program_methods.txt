@@ -1,0 +1,245 @@
+**STEP 3: PROGRAM EXTRACTION & DETAIL COLLECTION**
+
+You are a Senior Python Developer building a production TV schedule scraper. This is STEP 3 of 3 - the final step.
+
+**MISSION:** Extract all program data and their details from the saved HTML pages or navigate if we need to click on program details using a selector.
+
+**TARGET:** {channel_name} at {target_url}
+
+**CURRENT TASK INTELLIGENCE:**
+{current_task_intelligence}
+
+**HTML CONTENT:**
+{html_content}
+
+**THINK LIKE A HUMAN DEVELOPER:**
+1. I have HTML pages saved for each date from Step 2
+2. I need to extract program metadata (title, time, description) from these HTML files
+3. For each program, I need to get detailed information (either via URL or by clicking)
+4. I need to handle both scenarios: URL-based details and click-based details
+
+**YOUR TASK:** Generate this method for the IntelligentTVScraper class:
+
+**`async def program_extraction(self, date_html_files: Dict[str, str]) -> Dict[str, Any]:`**
+
+This method must handle BOTH scenarios intelligently:
+
+**SCENARIO 1: URL-Based Detail Access (PREFERRED)**
+- Extract program metadata + detail URLs from saved HTML files
+- Navigate directly to detail URLs
+- Extract additional detail data and save detail HTML pages
+- More reliable for production use
+
+**SCENARIO 2: Click-Based Detail Access (FALLBACK)**
+- Navigate back to each date page (live navigation)
+- Extract program metadata from live page
+- Click on each program to access details (modal/new page)
+- Handle return navigation properly
+
+**CRITICAL IMPLEMENTATION GUIDELINES:**
+
+**1. ANALYZE INTELLIGENCE FOR DETAIL ACCESS STRATEGY:**
+```python
+# Determine from intelligence data:
+# - Are program detail URLs available in the HTML?
+# - Do programs open details via clicking (modal/new page)?
+# - What selectors are available for program data?
+# - How are program details structured?
+```
+
+**2. URL-FIRST DETAIL ACCESS (PREFERRED):**
+```python
+# PREFERRED: Extract detail URLs from saved HTML
+for date_id, html_file_path in date_html_files.items():
+    with open(html_file_path, 'r', encoding='utf-8') as f:
+        html_content = f.read()
+    
+    # Parse HTML and extract programs with detail URLs
+    programs = self._extract_programs_from_html(html_content)
+    
+    for program in programs:
+        if program.get('detail_url'):
+            # Navigate to detail URL directly
+            await self.navigate_to_url(program['detail_url'])
+            # Extract and save detail data
+```
+
+**3. CLICK-BASED DETAIL ACCESS (FALLBACK):**
+```python
+# FALLBACK: Navigate to live pages and click for details
+for date_id, html_file_path in date_html_files.items():
+    # Navigate back to the live date page
+    await self._navigate_to_date_page(date_id)
+    
+    # Find all program elements on live page
+    program_elements = await self.page.query_selector_all(program_selector)
+    
+    for program_element in program_elements:
+        # Click to open details
+        await program_element.click()
+        # Extract detail data
+        # Handle return navigation
+```
+
+**4. ROBUST PROGRAM DATA EXTRACTION:**
+```python
+def _extract_programs_from_html(self, html_content: str) -> List[Dict[str, Any]]:
+    """Extract program data from HTML content"""
+    from bs4 import BeautifulSoup
+    
+    soup = BeautifulSoup(html_content, 'html.parser')
+    programs = []
+    
+    # Use intelligence selectors to find programs
+    program_containers = soup.select(program_container_selector)
+    
+    for container in program_containers:
+        program = {{
+            'title': self._safe_extract_text(container, title_selector),
+            'start_time': self._safe_extract_text(container, time_selector),
+            'description': self._safe_extract_text(container, description_selector),
+            'detail_url': self._safe_extract_attribute(container, detail_link_selector, 'href'),
+            'program_id': self._generate_program_id(container)
+        }}
+        
+        if program['title']:  # Only add if we have a title
+            programs.append(program)
+    
+    return programs
+
+def _safe_extract_text(self, container, selector: str) -> str:
+    """Safely extract text from element"""
+    try:
+        element = container.select_one(selector)
+        return element.get_text(strip=True) if element else ""
+    except:
+        return ""
+```
+
+**5. PRODUCTION ERROR HANDLING:**
+```python
+async def program_extraction(self, date_html_files: Dict[str, str]) -> Dict[str, Any]:
+    """Extract program metadata and details from saved HTML pages"""
+    try:
+        self.logger.info(f"Starting program extraction for {{len(date_html_files)}} dates")
+        extraction_results = {{
+            'programs_by_date': {{}},
+            'program_details': {{}},
+            'total_programs': 0,
+            'total_details': 0
+        }}
+        
+        # Determine detail access strategy from intelligence
+        detail_strategy = self._determine_detail_strategy()
+        
+        if detail_strategy == "url_based":
+            extraction_results = await self._extract_via_urls(date_html_files)
+        else:
+            extraction_results = await self._extract_via_clicks(date_html_files)
+        
+        self.logger.info(f"Program extraction completed: {{extraction_results['total_programs']}} programs, {{extraction_results['total_details']}} details")
+        return extraction_results
+        
+    except Exception as e:
+        self.logger.error(f"Program extraction failed: {{e}}")
+        return {{
+            'programs_by_date': {{}},
+            'program_details': {{}},
+            'total_programs': 0,
+            'total_details': 0,
+            'error': str(e)
+        }}
+```
+
+**BASE CLASS METHODS AVAILABLE:**
+- `await self.navigate_to_url(url)` - Navigate with retry logic
+- `await self.click(selector)` - Click with error handling
+- `await self.wait_for_element(selector, timeout)` - Wait for element
+- `await self.save_page_html(filename, page_type)` - Save HTML with metadata
+- `self.store_program_metadata(date_id, programs)` - Store program list
+- `self.store_program_detail_data(program_id, detail_data, html_path)` - Store details
+- `self.logger.info/error/warning()` - Logging methods
+
+**PROGRAM DATA STRUCTURE:**
+Each program should be structured as:
+```python
+{{
+    'title': 'Program Title',
+    'start_time': '20:00',
+    'end_time': '21:00',
+    'description': 'Program description',
+    'genre': 'Drama',
+    'detail_url': 'http://...' or '',
+    'program_id': 'unique_identifier',
+    'date': 'date_identifier'
+}}
+```
+
+**OUTPUT REQUIREMENTS:**
+- Generate ONLY the main method implementation and helper methods
+- No class definition, no imports (except within methods if needed)
+- Include comprehensive docstrings and error handling
+- Use intelligence data for actual selectors and patterns
+- Implement both URL-based and click-based detail access
+- Handle offline HTML processing and live page interaction
+- Make it production-ready with detailed logging
+
+**EXAMPLE STRUCTURE:**
+```python
+async def program_extraction(self, date_html_files: Dict[str, str]) -> Dict[str, Any]:
+    """
+    Extract program metadata and details from saved HTML pages
+    Handles both URL-based and click-based detail access strategies
+    """
+    try:
+        self.logger.info(f"Starting program extraction for {{len(date_html_files)}} dates")
+        
+        # Analyze intelligence to determine detail access strategy
+        detail_strategy = self._determine_detail_strategy()
+        self.logger.info(f"Using detail access strategy: {{detail_strategy}}")
+        
+        extraction_results = {{
+            'programs_by_date': {{}},
+            'program_details': {{}},
+            'total_programs': 0,
+            'total_details': 0
+        }}
+        
+        if detail_strategy == "url_based":
+            # URL-based extraction (preferred)
+            for date_id, html_file_path in date_html_files.items():
+                # Extract programs from saved HTML
+                # Navigate to detail URLs
+                # Save detail data
+                pass
+        else:
+            # Click-based extraction (fallback)
+            for date_id, html_file_path in date_html_files.items():
+                # Navigate to live date page
+                # Click on programs for details
+                # Handle return navigation
+                pass
+        
+        self.logger.info(f"Extraction completed: {{extraction_results['total_programs']}} programs")
+        return extraction_results
+        
+    except Exception as e:
+        self.logger.error(f"Program extraction failed: {{e}}")
+        return {{'error': str(e), 'programs_by_date': {{}}, 'program_details': {{}}}}
+
+def _determine_detail_strategy(self) -> str:
+    """Determine detail access strategy from intelligence data"""
+    # Analyze intelligence to decide URL vs click-based access
+    # Implementation based on intelligence patterns
+    
+def _extract_programs_from_html(self, html_content: str, date_id: str) -> List[Dict[str, Any]]:
+    """Extract program data from HTML content"""
+    # Parse HTML and extract program metadata
+    # Use intelligence selectors
+    
+def _safe_extract_text(self, container, selector: str) -> str:
+    """Safely extract text from element"""
+    # Safe text extraction with error handling
+```
+
+**REMEMBER:** This is the final step that produces the actual program data. Focus on reliability, comprehensive data extraction, and handling both URL-based and click-based detail access. The output of this method is what the end user will receive.

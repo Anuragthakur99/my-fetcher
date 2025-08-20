@@ -1,0 +1,201 @@
+**STEP 2: DATE DISCOVERY & HTML COLLECTION**
+
+You are a Senior Python Developer building a production TV schedule scraper. This is STEP 2 of 3.
+
+**MISSION:** Discover all available dates and collect HTML pages for each date (STORE-FIRST approach).
+
+**TARGET:** {channel_name} at {target_url}
+
+**CURRENT TASK INTELLIGENCE:**
+{current_task_intelligence}
+
+**HTML CONTENT:**
+{html_content}
+
+**THINK LIKE A HUMAN DEVELOPER:**
+1. First, I need to find all available dates on the website (today, tomorrow, next 7 days, etc.)
+2. Then, I need to navigate to each date and save the complete HTML page
+3. I'll extract program data later from these saved HTML files (STORE-FIRST approach)
+
+**YOUR TASK:** Generate these 2 methods for the IntelligentTVScraper class:
+
+**1. `async def collect_available_dates(self) -> List[str]:`**
+- Discover ALL available dates on the website
+- **ANALYZE INTELLIGENCE:** How are dates presented? (static list, date picker, pagination, etc.)
+- Extract date identifiers that can be used for navigation
+- Return list of date identifiers (strings that can navigate to each date)
+
+**2. `async def collect_date_html_pages(self, dates: List[str]) -> Dict[str, str]:`**
+- Navigate to each date in the provided list
+- **URL-FIRST APPROACH:** If intelligence shows URL patterns for dates, use direct navigation
+- **FALLBACK:** Use clicking/interaction if URL navigation not available
+- Scroll through entire page to load all content (handle lazy loading)
+- Save complete HTML page for each date
+- Return mapping: date_id -> saved_html_file_path
+
+**CRITICAL IMPLEMENTATION GUIDELINES:**
+
+**1. ANALYZE INTELLIGENCE FOR DATE NAVIGATION:**
+```python
+# Understand from intelligence:
+# - How are dates displayed? (calendar, list, dropdown, tabs)
+# - Is there a URL pattern for dates? (e.g., ?date=2024-01-15)
+# - Do dates require clicking or can we navigate directly?
+# - Are there "next/previous" buttons for date navigation?
+```
+
+**2. URL-FIRST DATE NAVIGATION:**
+```python
+# PREFERRED: URL-based date navigation
+if intelligence_shows_date_url_pattern:
+    for date_id in dates:
+        date_url = f"{{current_url}}?date={{date_id}}"
+        success = await self.navigate_to_url(date_url)
+        # Save HTML for this date
+
+# FALLBACK: Click-based navigation
+else:
+    for date_id in dates:
+        date_selector = f'[data-date="{{date_id}}"]'
+        await self.click(date_selector)
+        # Save HTML for this date
+```
+
+**3. STORE-FIRST APPROACH:**
+```python
+# Save HTML first, extract data later
+for date_id in dates:
+    # Navigate to date
+    # Scroll to load all content
+    await self.scroll_page("bottom")  # Load lazy content
+    
+    # Save complete HTML page
+    html_file_path = await self.save_page_html(f"date_{{date_id}}", "date_page")
+    self.store_date_html_file(date_id, html_file_path)
+```
+
+**4. HANDLE DYNAMIC CONTENT:**
+```python
+# Many TV schedule sites use lazy loading
+await self.scroll_page("bottom")  # Scroll to bottom
+await asyncio.sleep(2)  # Wait for content to load
+await self.scroll_page("top")     # Scroll back to top
+```
+
+**5. PRODUCTION ERROR HANDLING:**
+```python
+async def collect_available_dates(self) -> List[str]:
+    """Discover all available dates on the website"""
+    try:
+        available_dates = []
+        
+        # Implementation based on intelligence
+        # Handle different date presentation methods
+        
+        if available_dates:
+            self.store_available_dates(available_dates)
+            self.logger.info(f"Found {{len(available_dates)}} available dates")
+        else:
+            self.logger.warning("No dates found, using fallback strategy")
+            available_dates = self._generate_fallback_dates()
+        
+        return available_dates
+        
+    except Exception as e:
+        self.logger.error(f"Failed to collect available dates: {{e}}")
+        # Return fallback dates instead of crashing
+        return self._generate_fallback_dates()
+
+def _generate_fallback_dates(self) -> List[str]:
+    """Generate fallback date range if date discovery fails"""
+    from datetime import datetime, timedelta
+    dates = []
+    for i in range(7):  # Next 7 days
+        date = datetime.now() + timedelta(days=i)
+        dates.append(date.strftime('%Y-%m-%d'))
+    return dates
+```
+
+**BASE CLASS METHODS AVAILABLE:**
+- `await self.navigate_to_url(url)` - Navigate with retry logic
+- `await self.click(selector)` - Click with error handling
+- `await self.wait_for_element(selector, timeout)` - Wait for element
+- `await self.save_page_html(filename, page_type)` - Save HTML with metadata
+- `await self.scroll_page(direction)` - Scroll page (down/up/bottom/top)
+- `self.store_available_dates(dates)` - Store discovered dates
+- `self.store_date_html_file(date_id, html_path)` - Store HTML file mapping
+- `self.logger.info/error/warning()` - Logging methods
+
+**OUTPUT REQUIREMENTS:**
+- Generate ONLY the 2 method implementations
+- No class definition, no imports
+- Include comprehensive docstrings and error handling
+- Use intelligence data for actual selectors and patterns
+- Implement URL-first navigation strategy
+- Handle dynamic content loading
+- Make it production-ready with fallback strategies
+
+**EXAMPLE STRUCTURE:**
+```python
+async def collect_available_dates(self) -> List[str]:
+    """Discover and collect all available dates on the website"""
+    try:
+        self.logger.info("Discovering available dates...")
+        available_dates = []
+        
+        # Analyze intelligence for date discovery method
+        # Implementation based on intelligence data
+        
+        if available_dates:
+            self.store_available_dates(available_dates)
+            self.logger.info(f"Found {{len(available_dates)}} available dates")
+            return available_dates
+        else:
+            self.logger.warning("No dates discovered, using fallback")
+            return self._generate_fallback_dates()
+            
+    except Exception as e:
+        self.logger.error(f"Date discovery failed: {{e}}")
+        return self._generate_fallback_dates()
+
+async def collect_date_html_pages(self, dates: List[str]) -> Dict[str, str]:
+    """Navigate to each date and save complete HTML pages"""
+    self.logger.info(f"Collecting HTML pages for {{len(dates)}} dates...")
+    date_html_files = {{}}
+    
+    for date_id in dates:
+        try:
+            self.logger.info(f"Processing date: {{date_id}}")
+            
+            # Navigate to date (URL-first approach)
+            # Implementation based on intelligence
+            
+            # Scroll to load all content
+            await self.scroll_page("bottom")
+            await asyncio.sleep(2)
+            
+            # Save HTML page
+            html_file_path = await self.save_page_html(f"date_{{date_id}}", "date_page")
+            if html_file_path:
+                self.store_date_html_file(date_id, html_file_path)
+                date_html_files[date_id] = html_file_path
+                self.logger.info(f"Saved HTML for date {{date_id}}")
+            
+        except Exception as e:
+            self.logger.error(f"Failed to collect HTML for date {{date_id}}: {{e}}")
+            continue  # Continue with next date
+    
+    self.logger.info(f"Successfully collected {{len(date_html_files)}} HTML pages")
+    return date_html_files
+
+def _generate_fallback_dates(self) -> List[str]:
+    """Generate fallback date range if date discovery fails"""
+    from datetime import datetime, timedelta
+    dates = []
+    for i in range(7):
+        date = datetime.now() + timedelta(days=i)
+        dates.append(date.strftime('%Y-%m-%d'))
+    return dates
+```
+
+**REMEMBER:** This code will run in production daily. Focus on reliability, error handling, and the STORE-FIRST approach. Save all HTML pages first, then extract data in Step 3.

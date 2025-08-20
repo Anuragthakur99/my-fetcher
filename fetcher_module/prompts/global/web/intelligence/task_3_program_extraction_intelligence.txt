@@ -1,0 +1,224 @@
+You are analyzing a TV schedule website program extraction task for {target_url} (channel: {channel_name}).
+
+EXPLORATION HISTORY:
+{history_data}
+
+HTML CONTENT (if available):
+{html_content}
+
+TASK: Extract detailed step-by-step program extraction intelligence for automated code generation. The generated code must extract ALL programs from saved HTML pages for any date AND navigate to detail pages when available. Remove redundant steps.
+      CRITICAL: Extract multi-channel handling patterns, URL optimization strategies, and navigation efficiency patterns from the exploration history.
+
+Extract program extraction intelligence in JSON format:
+{{
+    "navigation_steps": [
+        {{
+            "step_number": 1,
+            "step_name": "descriptive_step_name",
+            "step_description": "What this step accomplishes",
+            "step_purpose": "Why this step is necessary",
+            "elements_involved": {{
+                "primary_selector": "Most reliable CSS selector found",
+                "fallback_selectors": ["Alternative selectors that worked"],
+                "xpath_selector": "XPath if CSS selectors are unreliable",
+                "element_attributes": {{
+                    "tag_name": "HTML tag name",
+                    "class_pattern": "Class patterns observed",
+                    "data_attributes": "Data attributes discovered",
+                    "text_content_pattern": "How text content appears",
+                    "href_pattern": "URL patterns in links",
+                    "other_attributes": "Other relevant attributes found"
+                }},
+                "selector_enhancement": {{
+                    "visual_context": "Additional selector insights from screenshots",
+                    "dom_structure": "DOM patterns from HTML content"
+                }}
+            }},
+            "actions_performed": [
+                {{
+                    "action_type": "click/wait/scroll/hover",
+                    "target_description": "Element that was targeted",
+                    "success_result": "What happened when action succeeded",
+                    "timing_observed": "Time taken in seconds"
+                }}
+            ],
+            "navigation_result": {{
+                "url_change_pattern": "How URL changed during this step",
+                "page_reload": true/false,
+                "ajax_request": true/false,
+                "dom_changes": "DOM changes observed",
+                "element_behavior": "How elements changed after this step"
+            }},
+            "wait_requirements": {{
+                "wait_condition": "What condition to wait for",
+                "wait_duration": "Time needed in seconds"
+            }},
+            "error_scenarios": {{
+                "failure_modes": ["Ways this step can fail"],
+                "recovery_actions": ["What to do when step fails"],
+                "skip_conditions": ["When this step can be skipped"]
+            }}
+        }}
+    ],
+    "program_extraction_patterns": {{
+        "program_container": {{
+            "container_selector": "Selector for program list container",
+            "program_item_selector": "Selector for individual program elements",
+            "program_structure": "How programs are organized (list/table/grid/cards)"
+        }},
+        "channel_handling": {{
+            "layout_type": "single_channel/multi_channel",
+            "channel_identification": {{
+                "channel_selector": "How to identify target channel programs",
+                "channel_filtering_method": "CSS selector/attribute/text content filtering",
+                "channel_indicator": "How channel is indicated in program elements"
+            }},
+            "multi_channel_strategy": {{
+                "channel_separation": "How channels are separated on the page",
+                "target_channel_isolation": "Method to extract only target channel programs",
+                "channel_validation": "How to confirm program belongs to target channel"
+            }}
+        }},
+        "program_metadata": {{
+            "data_field_selectors": {{
+                "title": "Selector for program title",
+                "time_start": "Selector for start time",
+                "time_end": "Selector for end time", 
+                "duration": "Selector for duration",
+                "description": "Selector for description",
+                "genre": "Selector for genre",
+                "rating": "Selector for rating",
+                "episode_info": "Selector for episode information",
+                "other_fields": "Other metadata fields found"
+            }},
+            "data_extraction_methods": {{
+                "text_content": "Fields extracted via textContent",
+                "attributes": "Fields extracted via attributes",
+                "data_attributes": "Fields extracted via data-* attributes",
+                "computed_values": "Fields requiring calculation or parsing"
+            }},
+            "data_reliability": {{
+                "consistent_fields": ["Fields present in all programs"],
+                "optional_fields": ["Fields that may be missing"],
+                "field_variations": "How field formats vary across programs"
+            }}
+        }}
+    }},
+    "navigation_optimization": {{
+        "url_based_navigation": {{
+            "url_pattern_available": true/false,
+            "direct_url_pattern": "URL pattern for direct program access",
+            "url_parameter_structure": "How program IDs/parameters are structured in URLs",
+            "url_efficiency": "Whether URL navigation is faster than clicking"
+        }},
+        "click_based_navigation": {{
+            "click_efficiency": "Speed and reliability of click-based access",
+            "click_target_selector": "Most reliable selector for clickable elements",
+            "click_behavior": "What happens when program is clicked"
+        }},
+        "optimal_strategy": {{
+            "recommended_method": "url_navigation/click_navigation/display_only",
+            "efficiency_reasoning": "Why this method is most efficient for this website",
+            "fallback_method": "Alternative method if primary fails"
+        }}
+    }},
+    "download_capabilities": {{
+        "download_available": true/false,
+        "download_strategy": {{
+            "file_formats": ["Available file formats (PDF, ZIP, etc.)"],
+            "download_scope": "daily/weekly/monthly/custom range coverage",
+            "file_naming_pattern": "How downloaded files are named",
+            "download_selectors": "Selectors for download links/buttons"
+        }},
+        "file_processing_requirements": {{
+            "extraction_method": "How to extract program data from files",
+            "file_structure": "Internal structure of downloaded files",
+            "parsing_complexity": "Complexity level of file parsing required"
+        }}
+    }},
+    "detail_access_strategy": {{
+        "detail_availability": "available/not_available",
+        "access_method": "url_navigation/click_navigation/inline_expansion/modal_popup",
+        "navigation_mechanism": {{
+            "trigger_element": "Element to click for detail access",
+            "trigger_selector": "Selector for clickable element",
+            "url_pattern": "URL pattern for direct navigation (if available)",
+            "loading_behavior": "How detail content loads",
+            "content_detection": "How to detect detail content is ready"
+        }},
+        "detail_content": {{
+            "additional_data_available": "What extra data is in details",
+            "detail_selectors": {{
+                "extended_description": "Selector for full description",
+                "cast_crew": "Selector for cast/crew information", 
+                "episode_details": "Selector for episode information",
+                "technical_info": "Selector for technical details",
+                "other_details": "Other detail fields available"
+            }}
+        }},
+        "return_navigation": {{
+            "return_method": "back_button/close_button/url_navigation/automatic",
+            "return_selector": "Selector for return element",
+            "state_preservation": "Whether page state is preserved on return",
+            "re_navigation_required": "Whether need to re-navigate to date page"
+        }}
+    }},
+    "implementation_strategy": {{
+        "extraction_workflow": {{
+            "offline_processing": "How to extract from saved HTML files",
+            "program_iteration": "How to loop through all programs",
+            "detail_processing": "How to handle detail page extraction",
+            "data_compilation": "How to combine main + detail data",
+            "channel_filtering": "How to extract only target channel programs",
+            "navigation_optimization": "Whether to use URL or click-based navigation"
+        }},
+        "selector_strategy": {{
+            "most_reliable_selectors": "Most dependable selector patterns",
+            "fallback_hierarchy": "Order of selector attempts for reliability",
+            "dynamic_handling": "How to handle elements that change",
+            "channel_specific_selectors": "Selectors for target channel identification"
+        }},
+        "efficiency_strategy": {{
+            "optimal_navigation_method": "Most efficient navigation approach for this website",
+            "bulk_processing": "How to handle multiple programs efficiently",
+            "resource_optimization": "Memory and time optimization considerations",
+            "parallel_processing": "Whether programs can be processed in parallel"
+        }},
+        "error_recovery": {{
+            "missing_data_handling": "How to handle missing program fields",
+            "detail_access_failures": "What to do when detail access fails",
+            "navigation_failures": "How to recover from navigation issues",
+            "channel_filtering_failures": "What to do when channel identification fails",
+            "fallback_strategies": "Alternative approaches when primary fails"
+        }}
+    }},
+    "technical_implementation": {{
+        "critical_steps": ["Steps that must succeed for extraction"],
+        "timing_strategy": {{
+            "extraction_timing": "Expected time for program extraction",
+            "detail_navigation_timing": "Time needed for detail access",
+            "critical_wait_points": ["Where waiting is essential"]
+        }},
+        "success_validation": {{
+            "extraction_confirmation": "How to confirm program extraction succeeded",
+            "detail_access_confirmation": "How to verify detail access worked",
+            "data_completeness_check": "How to validate extracted data"
+        }},
+        "implementation_notes": {{
+            "error_handling_approach": "Recommended error handling strategy",
+            "retry_strategy": "Which steps need retries and how many",
+            "scalability_considerations": ["Factors for processing many programs"]
+        }}
+    }}
+}}
+
+IMPORTANT: 
+1. Return ONLY the JSON object without markdown formatting
+2. Extract patterns from the actual exploration history
+3. Use visual/HTML context to enhance selector reliability when available
+4. Focus on patterns that enable extraction of ALL programs from saved HTML
+5. Provide comprehensive detail access and return navigation strategies
+6. Include robust error handling for missing data and failed navigation
+7. CRITICAL: Document multi-channel handling and target channel filtering methods
+8. CRITICAL: Extract URL optimization patterns and navigation efficiency strategies
+9. Document download capabilities when available as fallback extraction method

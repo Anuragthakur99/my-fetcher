@@ -1,0 +1,126 @@
+You are analyzing a TV schedule website channel detection task for {target_url} (channel: {channel_name}).
+
+EXPLORATION HISTORY:
+{history_data}
+
+HTML of the UI
+{html_content}
+
+TASK: Extract detailed step-by-step navigation intelligence that will be used for automated code generation. Each step must contain enough technical detail to write working Playwright code.
+      CRITICAL: Extract channel enumeration patterns (all available channels) and channel switching patterns (how to navigate to any channel) from the exploration history.
+      Remove any redundent steps.
+
+Extract channel detection intelligence in JSON format:
+{{
+    "navigation_steps": [
+        {{
+            "step_number": 1,
+            "step_name": "descriptive_step_name_like_popup_detection_or_channel_dropdown_click",
+            "step_description": "Clear description of what this step accomplishes",
+            "step_purpose": "Why this step is necessary for channel detection",
+            "elements_involved": {{
+                "primary_selector": "Most reliable CSS selector found during exploration",
+                "fallback_selectors": ["Alternative selectors if primary fails"],
+                "xpath_selector": "XPath if CSS selector is unreliable",
+                "element_attributes": {{
+                    "tag_name": "actual HTML tag name",
+                    "class_values": "actual class attribute values found",
+                    "id_value": "actual id attribute if present",
+                    "data_attributes": "any data-* attributes discovered",
+                    "text_content": "visible text content of element",
+                    "other_attributes": "any other relevant attributes"
+                }},
+            }},
+            "actions_performed": [
+                {{
+                    "action_type": "click/wait/scroll/type/hover/select",
+                    "target_description": "what element was targeted",
+                    "action_details": "specific details like text typed, option selected",
+                    "success_result": "what happened when action succeeded",
+                    "timing_observed": "actual time this action took in seconds"
+                }}
+            ],
+            "navigation_result": {{
+                "url_before": "URL before this step",
+                "url_after": "URL after this step", 
+                "url_change_pattern": "describe any URL pattern changes",
+                "page_reload": true/false,
+                "ajax_request": true/false,
+                "dom_changes": "description of DOM changes observed",
+                "content_changes": "description of visible content changes"
+            }},
+            "wait_requirements": {{
+                "wait_type": "explicit_wait/implicit_wait/sleep/none",
+                "wait_condition": "element_visible/element_clickable/url_change/content_loaded/ajax_complete",
+                "wait_duration": "actual wait time needed in seconds",
+                "wait_selector": "selector to wait for if applicable"
+            }},
+            "error_scenarios": {{
+                "possible_failures": ["list of ways this step could fail"],
+                "error_indicators": ["how to detect if step failed"],
+                "recovery_actions": ["what to do if step fails"],
+                "skip_conditions": ["when this step can be safely skipped"]
+            }}
+        }}
+    ],
+    "channel_detection_summary": {{
+        "channel_visible_initially": true/false,
+        "channel_navigation_required": true/false,
+        "channel_navigation_method": "dropdown/search/tabs/url_param/direct_access/none",
+        "channel_identifier_pattern": "how the target channel name appears in UI",
+        "channel_selection_confirmation": "how to verify correct channel is selected"
+    }},
+    "channel_enumeration_patterns": {{
+        "available_channels": ["list of all channel names/identifiers found on website"],
+        "channel_presentation_format": "dropdown/tabs/buttons/links/grid/list",
+        "channel_container_selector": "CSS selector for the container holding all channels",
+        "individual_channel_selector": "CSS selector pattern for individual channel elements",
+        "channel_identifier_extraction": {{
+            "text_source": "where channel name appears (text content, title attribute, data attribute)",
+            "naming_convention": "how channels are named (full names, abbreviations, codes)",
+            "identifier_attribute": "which HTML attribute contains the channel identifier"
+        }}
+    }},
+    "channel_switching_patterns": {{
+        "switching_mechanism": "click/select/url_change/form_submit",
+        "navigation_tested": "which channels were tested during exploration",
+        "url_pattern_changes": "how URLs change when switching channels",
+        "content_change_indicators": "how to detect successful channel switch",
+        "channel_parameter_mapping": {{
+            "input_format": "how channel names are provided to the scraper",
+            "website_format": "how channel names appear on the website",
+            "conversion_logic": "how to convert input channel name to website format"
+        }}
+    }},
+    "technical_implementation_guide": {{
+        "critical_steps": ["step numbers that must succeed for channel detection"],
+        "optional_steps": ["step numbers that can fail without breaking workflow"],
+        "step_dependencies": {{
+            "step_X_requires": ["list of prerequisite steps"]
+        }},
+        "most_reliable_selectors": ["selectors that worked consistently"],
+        "timing_requirements": {{
+            "total_navigation_time": "total time for all steps in seconds",
+            "critical_wait_points": ["steps where waiting is essential"],
+            "timeout_recommendations": ["recommended timeout values for each wait"]
+        }},
+        "success_detection": {{
+            "final_success_indicator": "how to confirm channel detection completed successfully",
+            "intermediate_checkpoints": ["how to verify each step succeeded"]
+        }},
+        "code_generation_notes": {{
+            "playwright_considerations": ["specific notes for Selenium implementation"],
+            "error_handling_strategy": ["recommended error handling approach"],
+            "retry_logic": ["which steps should have retry logic and how many attempts"]
+        }}
+    }}
+}}
+
+IMPORTANT: 
+1. Return ONLY the JSON object without markdown formatting
+2. Extract ACTUAL selectors, timings, and element details from the exploration history
+3. Focus on WORKING patterns that were successful during exploration
+4. Provide enough detail in each step for a developer to write working automation code
+5. Include real attribute values, class names, and element properties found during exploration
+6. CRITICAL: Extract all available channels listed during exploration and document channel switching patterns tested
+7. Document how to convert input channel names to website-specific channel identifiers

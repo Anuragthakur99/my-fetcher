@@ -1,0 +1,164 @@
+You are analyzing a TV schedule website date navigation task for {target_url} (channel: {channel_name}).
+
+EXPLORATION HISTORY:
+{history_data}
+
+HTML of the UI:
+{html_content}
+
+TASK: Extract detailed step-by-step date navigation intelligence for automated code generation. The exploration tests only 2-3 dates, but generated code must navigate ANY date available on this website. Extract generalizable patterns from the exploration. Remove redundant steps.
+      CRITICAL: Extract date range boundaries (earliest/latest dates), bulk date handling strategies, and date format conversion requirements from the exploration history.
+
+Extract date navigation intelligence in JSON format:
+{{
+    "navigation_steps": [
+        {{
+            "step_number": 1,
+            "step_name": "descriptive_step_name",
+            "step_description": "What this step accomplishes",
+            "step_purpose": "Why this step is necessary",
+            "elements_involved": {{
+                "primary_selector": "Most reliable CSS selector found",
+                "fallback_selectors": ["Alternative selectors that worked"],
+                "xpath_selector": "XPath if CSS selectors are unreliable",
+                "element_attributes": {{
+                    "tag_name": "HTML tag name",
+                    "class_pattern": "Class patterns observed",
+                    "data_attributes": "Data attributes discovered",
+                    "text_content_pattern": "How text content appears",
+                    "href_pattern": "URL patterns in links",
+                    "other_attributes": "Other relevant attributes found"
+                }},
+                "selector_enhancement": {{
+                    "visual_context": "Additional selector insights from screenshots",
+                    "dom_structure": "DOM patterns from HTML content"
+                }}
+            }},
+            "actions_performed": [
+                {{
+                    "action_type": "click/wait/scroll/hover/type",
+                    "target_description": "Element that was targeted",
+                    "success_result": "What happened when action succeeded",
+                    "timing_observed": "Time taken in seconds"
+                }}
+            ],
+            "navigation_result": {{
+                "url_change_pattern": "How URL changed during this step",
+                "page_reload": true/false,
+                "ajax_request": true/false,
+                "dom_changes": "DOM changes observed",
+                "element_behavior": "How elements changed after this step"
+            }},
+            "wait_requirements": {{
+                "wait_condition": "What condition to wait for",
+                "wait_duration": "Time needed in seconds"
+            }},
+            "error_scenarios": {{
+                "failure_modes": ["Ways this step can fail"],
+                "recovery_actions": ["What to do when step fails"],
+                "skip_conditions": ["When this step can be skipped"]
+            }}
+        }}
+    ],
+    "date_navigation_patterns": {{
+        "navigation_method": "URL_CHANGE/AJAX/STATIC/HYBRID",
+        "date_container": {{
+            "container_selector": "Selector for date container",
+            "date_item_selector": "Selector for individual date elements",
+            "date_range_behavior": "How many dates are visible and how they behave"
+        }},
+        "date_identification": {{
+            "date_value_source": "Where date values are stored",
+            "date_formats_found": "Date formats discovered on this site",
+            "date_matching_strategy": "How to match target dates with available dates",
+            "special_date_handling": "How relative dates are handled"
+        }},
+        "navigation_mechanisms": {{
+            "primary_method": "Main navigation approach observed",
+            "fallback_methods": ["Alternative navigation approaches"],
+            "direct_access": "Whether dates can be accessed directly"
+        }}
+    }},
+    "date_range_boundaries": {{
+        "earliest_date_available": "Minimum date that can be accessed on this website",
+        "latest_date_available": "Maximum date that can be accessed on this website",
+        "total_date_range_days": "Total number of days available for navigation",
+        "boundary_detection_method": "How the earliest and latest dates were identified",
+        "date_availability_pattern": "Whether dates are continuous or have gaps",
+        "range_limitations": "Any restrictions on date range access discovered"
+    }},
+    "bulk_date_handling": {{
+        "bulk_navigation_available": true/false,
+        "bulk_navigation_type": "week/month/quarter/custom",
+        "bulk_period_identification": "How to identify which bulk period contains specific dates",
+        "date_range_strategy": "How to handle multi-day date ranges efficiently",
+        "period_boundary_logic": "How to find the right week/month for any date range",
+        "bulk_to_individual_access": "Whether individual dates are accessible within bulk periods"
+    }},
+    "date_format_conversion": {{
+        "website_native_format": "The date format used by this website",
+        "input_format_expected": "Format that will be provided to the generated code",
+        "conversion_requirements": "What conversion is needed between input and website format",
+        "format_validation_logic": "How to validate date formats before navigation",
+        "localization_considerations": "Language/region specific date formatting"
+    }},
+    "implementation_strategy": {{
+        "date_discovery": {{
+            "find_available_dates": "How to discover all available dates",
+            "date_range_detection": "How to detect date boundaries (earliest/latest)",
+            "target_date_location": "Strategy to locate any specific target date",
+            "bulk_period_detection": "How to find which week/month contains target date ranges"
+        }},
+        "selector_strategy": {{
+            "most_reliable_approach": "Most dependable selector strategy",
+            "fallback_hierarchy": "Order of selector attempts for reliability",
+            "dynamic_handling": "How to handle elements that change"
+        }},
+        "date_format_strategy": {{
+            "input_handling": "How to handle input date formats (MM/DD/YYYY)",
+            "site_format_adaptation": "How to convert to website's native date format",
+            "conversion_approach": "Date format conversion strategy implementation",
+            "validation_logic": "How to validate dates before navigation attempts"
+        }},
+        "date_range_strategy": {{
+            "single_date_navigation": "How to navigate to a single specific date",
+            "multi_date_range_handling": "How to handle date ranges (from_date to to_date)",
+            "bulk_range_optimization": "How to efficiently navigate date ranges using bulk periods",
+            "range_impossibility_handling": "What to do when date range navigation is not possible"
+        }},
+        "error_recovery": {{
+            "common_failures": ["Common failure scenarios observed"],
+            "recovery_strategies": ["How to recover from failures"],
+            "alternative_approaches": ["Backup methods when primary fails"],
+            "boundary_violations": "How to handle dates outside available range"
+        }}
+    }},
+    "technical_implementation": {{
+        "critical_steps": ["Steps that must succeed for navigation"],
+        "timing_strategy": {{
+            "total_navigation_time": "Expected total time for navigation",
+            "critical_wait_points": ["Where waiting is essential"],
+            "timeout_recommendations": ["Recommended timeout values"]
+        }},
+        "success_validation": {{
+            "navigation_confirmation": "How to confirm navigation succeeded",
+            "content_verification": "How to verify correct date content loaded",
+            "failure_detection": "How to detect when navigation failed"
+        }},
+        "implementation_notes": {{
+            "error_handling_approach": "Recommended error handling strategy",
+            "retry_strategy": "Which steps need retries and how many",
+            "robustness_considerations": ["Factors that improve reliability"]
+        }}
+    }}
+}}
+
+IMPORTANT: 
+1. Return ONLY the JSON object without markdown formatting
+2. Extract patterns from the actual exploration history
+3. Use visual/HTML context to enhance selector reliability when available
+4. Focus on generalizable patterns that work for any date on this site
+5. Provide comprehensive error handling and fallback strategies
+6. Include enough detail for generating robust automation code
+7. CRITICAL: Extract date range boundaries (min/max dates) and document bulk date handling strategies
+8. CRITICAL: Document date format conversion requirements and range navigation impossibility when applicable

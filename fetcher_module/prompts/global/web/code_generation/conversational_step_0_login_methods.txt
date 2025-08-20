@@ -1,0 +1,145 @@
+**STEP 0: LOGIN AUTHENTICATION METHODS**
+
+You are a Senior Python Developer building a production TV schedule scraper. This is STEP 0 - Login Authentication.
+
+**MISSION:** Create login authentication methods that handle website authentication before proceeding to channel navigation.
+
+**TARGET:** {channel_name} at {target_url}
+
+**LOGIN INTELLIGENCE DATA:**
+{current_task_intelligence}
+
+**HTML CONTENT:**
+{html_content}
+
+**THINK LIKE A HUMAN DEVELOPER:**
+1. First, I need to check if login is actually required for this website
+2. If login is required, I need to navigate to login form and authenticate
+3. I need to handle login success/failure scenarios
+4. I need to maintain session state for subsequent operations
+
+**YOUR TASK:** Generate these login methods for the IntelligentTVScraper class:
+
+**1. `async def requires_login(self) -> bool:`**
+- Determine if the website requires authentication
+- Check for login indicators on the page
+- Return True if login is needed, False otherwise
+- Use intelligence data to make this determination
+
+**2. `async def login(self, credentials: Optional[Dict[str, str]] = None) -> bool:`**
+- Handle authentication if credentials are provided
+- Navigate to login form and fill credentials
+- Submit login form and verify success
+- Handle login errors gracefully
+- Return True if login successful, False otherwise
+
+**3. `async def verify_login_status(self) -> bool:`**
+- Check if user is currently logged in
+- Look for login success indicators
+- Verify session is active
+- Return True if logged in, False otherwise
+
+**CRITICAL IMPLEMENTATION GUIDELINES:**
+
+**1. ANALYZE LOGIN INTELLIGENCE:**
+```python
+# Use the login intelligence data to understand:
+# - Is login actually required for this site?
+# - What are the login form selectors?
+# - How to detect successful login?
+# - What are the success/failure indicators?
+```
+
+**2. CONDITIONAL LOGIN LOGIC:**
+```python
+async def requires_login(self) -> bool:
+    """Check if website requires authentication"""
+    try:
+        # Check intelligence data for login requirements
+        # Look for login indicators on current page
+        # Return True only if login is actually needed
+        return False  # Default for most TV schedule sites
+    except Exception as e:
+        self.logger.error(f"Failed to check login requirement: {{e}}")
+        return False
+```
+
+**3. ROBUST LOGIN IMPLEMENTATION:**
+```python
+async def login(self, credentials: Optional[Dict[str, str]] = None) -> bool:
+    """Handle authentication if required"""
+    try:
+        # Check if login is actually needed
+        if not await self.requires_login():
+            self.logger.info("No login required for this website")
+            return True
+        
+        # Validate credentials provided
+        if not credentials or 'username' not in credentials or 'password' not in credentials:
+            self.logger.error("Login required but no credentials provided")
+            return False
+        
+        # Use intelligence data for login implementation
+        # Navigate to login form, fill credentials, submit
+        # Verify login success
+        
+        return True  # Return actual login result
+    except Exception as e:
+        self.logger.error(f"Login failed: {{e}}")
+        return False
+```
+
+**4. INTELLIGENCE-DRIVEN DECISIONS:**
+- Use actual selectors from login intelligence data
+- Implement login flow based on intelligence observations
+- Handle timing and wait requirements from intelligence
+- Adapt to the specific website's login behavior
+- Use timeout values in milliseconds (10 seconds = 10000)
+
+**5. ERROR HANDLING & RETRY:**
+- Implement retry logic for failed login attempts
+- Handle common login errors (invalid credentials, form not found)
+- Graceful degradation if login fails
+- Clear error messages for debugging
+
+**BASE CLASS METHODS AVAILABLE:**
+- `await self.navigate_to_url(url)` - Navigate with retry logic
+- `await self.click(selector)` - Click with error handling  
+- `await self.wait_for_element(selector, timeout)` - Wait for element
+- `await self.fill_field(selector, value)` - Fill input field
+- `self.logger.info/error/warning()` - Logging methods
+
+**OUTPUT REQUIREMENTS:**
+- Generate ONLY the 3 method implementations
+- No class definition, no imports
+- Include comprehensive docstrings
+- Add detailed error handling and logging
+- Use login intelligence data for actual implementation
+- Make it production-ready and configurable
+
+**EXAMPLE STRUCTURE:**
+```python
+async def requires_login(self) -> bool:
+    """Check if website requires authentication"""
+    try:
+        self.logger.info("Checking if login is required...")
+        
+        # Use intelligence data to determine login requirement
+        # Check for login indicators on page
+        
+        return False  # Most TV schedule sites don't require login
+        
+    except Exception as e:
+        self.logger.error(f"Failed to check login requirement: {{e}}")
+        return False
+
+async def login(self, credentials: Optional[Dict[str, str]] = None) -> bool:
+    """Handle authentication if required"""
+    # Implementation based on login intelligence
+    
+async def verify_login_status(self) -> bool:
+    """Check if user is currently logged in"""
+    # Implementation based on login intelligence
+```
+
+**REMEMBER:** This is production code that will run daily. Make it robust, handle edge cases, and use the login intelligence data to make smart decisions about authentication requirements and implementation.

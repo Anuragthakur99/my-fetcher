@@ -1,0 +1,139 @@
+**STEP 1: WEBSITE FOUNDATION & CHANNEL NAVIGATION**
+
+You are a Senior Python Developer building a production TV schedule scraper. This is STEP 1 of the conversational process.
+
+**MISSION:** Create the foundation methods that get us to the target channel page, ready for date navigation.
+
+**TARGET:** {channel_name} at {target_url}
+
+**INTELLIGENCE DATA:**
+{current_task_intelligence}
+
+**HTML CONTENT:**
+{html_content}
+
+**THINK LIKE A HUMAN DEVELOPER:**
+1. First, I need to open the website and handle any popups/cookies
+2. Then, I need to navigate to the specific channel (if it's not already visible)
+3. Finally, I need to verify I'm on the right channel page
+
+**YOUR TASK:** Generate these 2 methods for the IntelligentTVScraper class:
+
+You can add other method also, or change the method signature if needed, do not make the generated code too verbose, keep it minimal and lightweight and futureproof
+
+**1. `async def prelogin(self) -> bool:`**
+- Open the base URL and wait for page to load
+- Handle any popups, cookie banners, or modals that appear
+- Get the page ready for channel navigation
+- **URL-FIRST APPROACH:** If intelligence shows a direct channel URL, consider navigating there directly
+
+**2. `async def channel_navigation(self) -> bool:`**
+- Navigate to the specific channel: `{channel_name}`
+- **ANALYZE INTELLIGENCE:** Determine the navigation method (dropdown, search, tabs, direct URL)
+- **URL-FIRST:** If intelligence shows URL patterns, use direct navigation
+- **FALLBACK:** Use selector-based navigation if URL approach fails
+- Verify you've reached the correct channel page
+- Navigate to the specific channel: `{channel_name}`
+- **ANALYZE INTELLIGENCE:** Determine the navigation method (dropdown, search, tabs, direct URL)
+- **URL-FIRST:** If intelligence shows URL patterns, use direct navigation
+- **FALLBACK:** Use selector-based navigation if URL approach fails
+- Verify you've reached the correct channel page
+
+**CRITICAL IMPLEMENTATION GUIDELINES:**
+
+**1. ANALYZE INTELLIGENCE FIRST:**
+```python
+# Read the intelligence data to understand:
+# - Is there a direct channel URL pattern?
+# - What navigation method does the site use?
+# - Are there popups or authentication requirements?
+# - What selectors are available for channel navigation?
+```
+
+**2. URL-FIRST NAVIGATION STRATEGY:**
+```python
+# PREFERRED: Direct URL navigation
+if intelligence_shows_channel_url_pattern:
+    channel_url = f"{{self.base_url}}/channel/{{self.channel_name.lower()}}"
+    success = await self.navigate_to_url(channel_url)
+    if success:
+        return True
+
+# FALLBACK: Selector-based navigation
+# Only if URL navigation fails or isn't available
+```
+
+**3. PRODUCTION-READY ERROR HANDLING:**
+```python
+async def prelogin(self) -> bool:
+    """Open website and handle initial setup"""
+    try:
+        # Main logic here
+        return True
+    except Exception as e:
+        self.logger.error(f"Prelogin failed: {{e}}")
+        return False
+```
+
+**4. CONFIGURABLE CHANNEL HANDLING:**
+```python
+# DON'T hardcode channel names in selectors
+# DO use self.channel_name dynamically
+channel_selector = f'[data-channel="{{self.channel_name}}"]'
+# or
+search_input = await self.wait_for_element('input[placeholder*="channel"]')
+await search_input.fill(self.channel_name)
+```
+
+**5. INTELLIGENCE-DRIVEN DECISIONS:**
+- Use actual selectors from intelligence data
+- Implement fallback strategies for failed selectors
+- Handle timing based on intelligence observations
+- Adapt to the specific website's behavior patterns
+- if you are using any predefined method give timout in millisecond , if its 10 second, then put 10000
+
+**BASE CLASS METHODS AVAILABLE:**
+- `await self.navigate_to_url(url)` - Navigate with retry logic
+- `await self.click(selector)` - Click with error handling  
+- `await self.wait_for_element(selector, timeout)` - Wait for element
+- `await self.save_page_html(filename)` - Save current page HTML
+- `self.logger.info/error/warning()` - Logging methods
+
+**OUTPUT REQUIREMENTS:**
+- Generate ONLY the 2 method implementations
+- No class definition, no imports
+- Include comprehensive docstrings
+- Add detailed error handling and logging
+- Use intelligence data for actual implementation
+- Make it production-ready and configurable
+
+**EXAMPLE STRUCTURE:**
+```python
+async def prelogin(self) -> bool:
+    """Open base URL and handle initial setup"""
+    try:
+        self.logger.info(f"Opening website: {{self.base_url}}")
+        
+        # Navigate to base URL
+        success = await self.navigate_to_url(self.base_url)
+        if not success:
+            return False
+        
+        # Handle popups based on intelligence
+        # Implementation based on intelligence data
+        
+        self.logger.info("Website opened successfully")
+        return True
+        
+    except Exception as e:
+        self.logger.error(f"Prelogin failed: {{e}}")
+        return False
+
+async def channel_navigation(self) -> bool:
+    """Navigate to target channel: {channel_name}"""
+    # Analyze intelligence for navigation method
+    # Implement URL-first approach
+    # Implementation here
+```
+
+**REMEMBER:** This is production code that will run daily. Make it robust, configurable, and intelligent. Use the intelligence data to make smart decisions about navigation strategies.

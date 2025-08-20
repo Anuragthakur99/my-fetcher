@@ -1,0 +1,152 @@
+**ITERATIVE STEP 1: LOGIN CODE GENERATION & TESTING**
+
+You are a Senior Python Developer generating production-ready login methods for a TV schedule scraper using Playwright.
+
+**TARGET WEBSITE:** {target_url}
+**CHANNEL:** {channel_name}
+**CLASS NAME:** {class_name}
+**WEBSITE NAME:** {website_name}
+
+**MISSION:** Generate ONLY the login-related methods that inherit from IterativeTVScraper and can be immediately tested.
+
+**LOGIN INTELLIGENCE DATA:**
+{current_task_intelligence}
+
+**HTML CONTENT:**
+{html_content}
+
+**BASE CLASS STRUCTURE:**
+Your generated class must inherit from IterativeTVScraper:
+
+```python
+import asyncio
+from typing import Dict
+from src.scrapers.iterative_tv_scraper import IterativeTVScraper, TVScraperError, ScraperConfig
+from playwright.async_api import Page
+
+class {class_name}(IterativeTVScraper):
+    def __init__(self, config: ScraperConfig = None):
+        super().__init__("{website_name}", "{target_url}", config)
+```
+
+**CRITICAL: METHOD SIGNATURES**
+Your methods MUST use these exact signatures with page parameter:
+
+```python
+async def requires_login(self, page: Page) -> bool:
+async def login(self, page: Page, credentials: Dict[str, str] = None) -> bool:
+```
+
+**BROWSER OPERATIONS:**
+- Use `page.goto()` for navigation (NOT self._page.goto())
+- Use `page.query_selector()` for element detection
+- Use `page.fill()`, `page.click()` for interactions
+- Use `page.wait_for_load_state()` for waiting
+- Use `page.url` for URL checking
+- NO assumptions about browser lifecycle - page object is provided
+
+**ERROR HANDLING:**
+```python
+raise TVScraperError("Descriptive message", "ERROR_CODE", {{"context": "data"}})
+```
+
+**IMPLEMENTATION EXAMPLES:**
+
+**If Login NOT Required:**
+```python
+async def requires_login(self, page: Page) -> bool:
+    """No login required for this website"""
+    try:
+        await page.goto(self.base_url, timeout=30000)
+        await page.wait_for_load_state()
+        await asyncio.sleep(2)  # Wait for page to stabilize
+        
+        # Check intelligence patterns - no login found
+        self.logger.info("No login required")
+        return False
+    except Exception as e:
+        raise TVScraperError(f"Failed to check login: {{str(e)}}", "LOGIN_CHECK_FAILED")
+
+# DO NOT implement login() method - use default from base class
+```
+
+**If Login Required:**
+```python
+async def requires_login(self, page: Page) -> bool:
+    """Login required for this website"""
+    try:
+        await page.goto(self.base_url, timeout=30000)
+        await page.wait_for_load_state()
+        await asyncio.sleep(2)  # Wait for page to stabilize
+        
+        # Use intelligence selectors to detect login
+        login_form = await page.query_selector("LOGIN_SELECTOR_FROM_INTELLIGENCE")
+        
+        if login_form:
+            self.logger.info("Login required - form detected")
+            return True
+        
+        return False
+        
+    except Exception as e:
+        raise TVScraperError(f"Failed to check login: {{str(e)}}", "LOGIN_CHECK_FAILED")
+
+async def login(self, page: Page, credentials: Dict[str, str] = None) -> bool:
+    """Handle website authentication"""
+    try:
+        if not await self.requires_login(page):
+            return True
+        
+        # Get credentials
+        creds = credentials or self.config.credentials
+        if not creds or 'username' not in creds or 'password' not in creds:
+            raise TVScraperError("Login required but credentials missing", "NO_CREDENTIALS")
+        
+        # Navigate to login page
+        await page.goto(self.base_url, timeout=30000)
+        await page.wait_for_load_state()
+        await asyncio.sleep(2)  # Wait for page to load
+        
+        # Wait for login form elements
+        await page.wait_for_selector("USERNAME_SELECTOR_FROM_INTELLIGENCE", timeout=10000)
+        
+        # Fill credentials with proper waits
+        await page.fill("USERNAME_SELECTOR_FROM_INTELLIGENCE", creds['username'])
+        await asyncio.sleep(1)  # Wait after filling username
+        
+        await page.fill("PASSWORD_SELECTOR_FROM_INTELLIGENCE", creds['password'])
+        await asyncio.sleep(1)  # Wait after filling password
+        
+        # Submit form
+        await page.click("SUBMIT_SELECTOR_FROM_INTELLIGENCE")
+        await asyncio.sleep(2)  # Wait after clicking submit
+        
+        # Wait for navigation/response
+        await page.wait_for_load_state()
+        await asyncio.sleep(3)  # Allow page to settle after login
+        
+        # Verify success using intelligence patterns
+        if "SUCCESS_INDICATOR_FROM_INTELLIGENCE" in page.url:
+            self.logger.info("Login successful")
+            return True
+        else:
+            raise TVScraperError("Login verification failed", "LOGIN_VERIFICATION_FAILED")
+            
+    except TVScraperError:
+        raise
+    except Exception as e:
+        raise TVScraperError(f"Login failed: {{str(e)}}", "LOGIN_FAILED")
+```
+
+**CRITICAL REQUIREMENTS:**
+- Always implement `requires_login(page: Page)` - mandatory
+- Only implement `login(page: Page, credentials)` if login required
+- Use exact intelligence data for selectors and navigation
+- Include proper waits: `asyncio.sleep()` and `page.wait_for_load_state()`
+- Add timeout=30000 to navigation calls
+- Use page parameter for ALL browser operations
+- NO browser lifecycle management - page is provided
+- Include proper TVScraperError handling
+
+**DELIVERABLE:**
+Complete Python class that inherits from IterativeTVScraper with proper method signatures using page parameter.

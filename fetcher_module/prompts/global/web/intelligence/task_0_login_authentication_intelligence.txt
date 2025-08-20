@@ -1,0 +1,100 @@
+You are analyzing a TV schedule website login authentication task for {target_url}.
+
+EXPLORATION HISTORY:
+{history_data}
+
+HTML of the UI:
+{html_content}
+
+TASK: Extract detailed step-by-step login intelligence that will be used for automated code generation. Each step must contain enough technical detail to write working Playwright code.
+
+Extract login authentication intelligence in JSON format:
+
+{{
+    "navigation_steps": [
+        {{
+            "step_number": 1,
+            "step_name": "descriptive_step_name_like_login_form_access_or_credential_filling",
+            "step_description": "Clear description of what this step accomplishes",
+            "step_purpose": "Why this step is necessary for login authentication",
+            "elements_involved": {{
+                "primary_selector": "Most reliable CSS selector found during exploration",
+                "fallback_selectors": ["Alternative selectors if primary fails"],
+                "xpath_selector": "XPath if CSS selector is unreliable",
+                "element_attributes": {{
+                    "tag_name": "actual HTML tag name",
+                    "class_values": "actual class attribute values found",
+                    "id_value": "actual id attribute if present",
+                    "data_attributes": "any data-* attributes discovered",
+                    "text_content": "visible text content of element",
+                    "other_attributes": "any other relevant attributes like name, type"
+                }}
+            }},
+            "actions_performed": [
+                {{
+                    "action_type": "click/wait/type/submit",
+                    "target_description": "what element was targeted",
+                    "action_details": "specific details like credentials typed, button clicked",
+                    "success_result": "what happened when action succeeded",
+                    "timing_observed": "actual time this action took in seconds"
+                }}
+            ],
+            "navigation_result": {{
+                "url_before": "URL before this step",
+                "url_after": "URL after this step",
+                "url_change_pattern": "describe any URL pattern changes",
+                "page_reload": true/false,
+                "ajax_request": true/false,
+                "dom_changes": "description of DOM changes observed",
+                "content_changes": "description of visible content changes"
+            }},
+            "wait_requirements": {{
+                "wait_type": "explicit_wait/implicit_wait/no_wait",
+                "wait_condition": "url_change/element_visible/content_loaded",
+                "wait_duration": "recommended wait time in seconds",
+                "wait_selector": "selector to wait for if applicable"
+            }},
+            "error_scenarios": {{
+                "possible_failures": ["list of things that could go wrong"],
+                "error_indicators": ["selectors or signs that indicate failure"],
+                "recovery_actions": ["what to do if this step fails"],
+                "skip_conditions": ["when this step can be skipped"]
+            }}
+        }}
+    ],
+    "login_authentication_summary": {{
+        "login_method": "form_based/popup/redirect/oauth",
+        "login_url": "direct URL to login page if applicable",
+        "form_location": "where login form is located on page",
+        "credentials_required": ["username", "password", "other fields"],
+        "success_detection": "how to detect successful login",
+        "session_persistence": "how login state is maintained"
+    }},
+    "technical_implementation_guide": {{
+        "critical_steps": ["list of step numbers that are essential"],
+        "optional_steps": ["list of step numbers that can be skipped"],
+        "step_dependencies": {{
+            "step_X_requires": ["list of prerequisite steps"]
+        }},
+        "most_reliable_selectors": ["list of most reliable selectors found"],
+        "timing_requirements": {{
+            "total_login_time": "total time for complete login process",
+            "critical_wait_points": ["where waits are most important"],
+            "timeout_recommendations": {{
+                "form_load_timeout": "recommended timeout for form loading",
+                "submission_timeout": "recommended timeout for form submission"
+            }}
+        }},
+        "success_detection": {{
+            "final_success_indicator": "primary way to detect login success",
+            "intermediate_checkpoints": ["ways to verify progress during login"]
+        }},
+        "code_generation_notes": {{
+            "playwright_considerations": ["specific Playwright implementation notes"],
+            "error_handling_strategy": ["how to handle common login errors"],
+            "retry_logic": ["recommended retry approach for failed login"]
+        }}
+    }}
+}}
+
+IMPORTANT: Return ONLY the JSON object above, no additional text, explanations, or markdown formatting. The response must start with {{ and end with }}.

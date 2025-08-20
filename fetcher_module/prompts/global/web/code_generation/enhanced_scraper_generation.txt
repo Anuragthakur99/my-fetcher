@@ -1,0 +1,658 @@
+**FINAL SCRAPER ASSEMBLY - PRODUCTION READY TV SCHEDULE SCRAPER**
+
+You are a Senior Software Architect assembling the final production-ready TV schedule scraper.
+
+**TARGET:** {target_url}
+**CHANNEL:** {channel_name}
+**CLASS NAME:** {class_name}
+
+**MISSION:** Create a complete, production-ready scraper that combines the 3 generated method sets from our previous conversation into a cohesive workflow.
+
+**ARCHITECTURAL APPROACH:**
+This scraper will be used DAILY in production to:
+1. Navigate to the target channel
+2. Discover and collect all available dates  
+3. Extract all programs and their details
+4. Store everything in organized, reusable format
+
+**GENERATED METHODS FROM PREVIOUS STEPS:**
+You have already generated in our conversation:
+- Step 1 methods: `prelogin()`, `login()`, `channel_navigation()`
+- Step 2 methods: `collect_available_dates()`, `collect_date_html_pages()`
+- Step 3 methods: `program_extraction()` and helper methods
+
+**YOUR TASK:** Create the complete scraper class that integrates all the methods you've generated in our conversation.
+
+1. **Main workflow orchestration** in `execute_complete_workflow()`
+2. **Integration of all 3 method sets** in logical sequence
+3. **Production-ready error handling** and recovery
+4. **Comprehensive logging and monitoring**
+5. **Clean data output** for daily production use
+
+**CRITICAL REQUIREMENTS:**
+
+**1. WORKFLOW ORCHESTRATION:**
+```python
+async def execute_complete_workflow(self) -> Dict[str, Any]:
+    """
+    Main workflow that orchestrates all scraping steps
+    This is the entry point for daily production runs
+    """
+    try:
+        # Step 1: Foundation & Channel Navigation
+        if not await self.prelogin():
+            raise Exception("Failed to open website")
+        
+        if not await self.login():
+            raise Exception("Failed to handle authentication")
+        
+        if not await self.channel_navigation():
+            raise Exception("Failed to navigate to channel")
+        
+        # Step 2: Date Discovery & HTML Collection
+        available_dates = await self.collect_available_dates()
+        if not available_dates:
+            raise Exception("No dates found")
+        
+        date_html_files = await self.collect_date_html_pages(available_dates)
+        if not date_html_files:
+            raise Exception("No HTML pages collected")
+        
+        # Step 3: Program Extraction & Details
+        program_data = await self.program_extraction(date_html_files)
+        
+        # Return organized results
+        return {{
+            'success': True,
+            'channel': self.channel_name,
+            'dates_processed': len(date_html_files),
+            'programs_found': program_data.get('total_programs', 0),
+            'program_details': program_data.get('total_details', 0),
+            'data': program_data
+        }}
+        
+    except Exception as e:
+        self.logger.error(f"Workflow failed: {{e}}")
+        return {{
+            'success': False,
+            'error': str(e),
+            'channel': self.channel_name
+        }}
+```
+
+**2. PRODUCTION ERROR HANDLING:**
+- Each step should handle failures gracefully
+- Log detailed error information for debugging
+- Continue with partial results when possible
+- Never crash the entire workflow for single failures
+
+**3. CLEAN DATA OUTPUT:**
+```python
+# Final output structure should be:
+{{
+    'success': True,
+    'channel': 'Channel Name',
+    'scraping_date': '2024-01-15',
+    'dates_processed': 7,
+    'programs_found': 150,
+    'program_details': 150,
+    'data': {{
+        'programs_by_date': {{
+            '2024-01-15': [
+                {{
+                    'title': 'Program Title',
+                    'start_time': '20:00',
+                    'end_time': '21:00',
+                    'description': 'Description',
+                    'detail_data': {{...}}
+                }}
+            ]
+        }}
+    }}
+}}
+```
+
+**COMPLETE SCRAPER TEMPLATE:**
+
+```python
+import asyncio
+import json
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, List, Optional, Any
+from bs4 import BeautifulSoup
+
+from src.scrapers.smart_tv_scraper import IntelligentTVScraper
+
+class {class_name}(IntelligentTVScraper):
+    """
+    Production-ready TV schedule scraper for {channel_name}
+    Auto-generated using intelligent analysis of {target_url}
+    
+    This scraper runs daily in production to collect:
+    - All available dates on the website
+    - All programs for each date
+    - Detailed information for each program
+    """
+    
+    def __init__(self):
+        super().__init__("{channel_name}", "{target_url}")
+        self.logger.info(f"Initialized scraper for {{self.channel_name}}")
+    
+    # ==================== STEP 1: FOUNDATION & CHANNEL NAVIGATION ====================
+    # [INSERT STEP 1 GENERATED METHODS HERE]
+    
+    # ==================== STEP 2: DATE DISCOVERY & HTML COLLECTION ====================
+    # [INSERT STEP 2 GENERATED METHODS HERE]
+    
+    # ==================== STEP 3: PROGRAM EXTRACTION & DETAILS ====================
+    # [INSERT STEP 3 GENERATED METHODS HERE]
+    
+    # ==================== MAIN WORKFLOW ORCHESTRATION ====================
+    
+    async def execute_complete_workflow(self) -> Dict[str, Any]:
+        """
+        Main production workflow - orchestrates all scraping steps
+        This method is called daily by the production scheduler
+        """
+        workflow_start = datetime.now()
+        self.logger.info(f"Starting complete workflow for {{self.channel_name}}")
+        
+        try:
+            # Step 1: Foundation & Channel Navigation
+            self.logger.info("Phase 1: Foundation & Channel Navigation")
+            
+            if not await self.prelogin():
+                raise Exception("Failed to initialize website")
+            
+            if not await self.login():
+                raise Exception("Failed to handle authentication")
+            
+            if not await self.channel_navigation():
+                raise Exception(f"Failed to navigate to channel: {{self.channel_name}}")
+            
+            # Step 2: Date Discovery & HTML Collection
+            self.logger.info("Phase 2: Date Discovery & HTML Collection")
+            
+            available_dates = await self.collect_available_dates()
+            if not available_dates:
+                raise Exception("No available dates found")
+            
+            self.logger.info(f"Found {{len(available_dates)}} available dates")
+            
+            date_html_files = await self.collect_date_html_pages(available_dates)
+            if not date_html_files:
+                raise Exception("Failed to collect HTML pages")
+            
+            self.logger.info(f"Collected HTML for {{len(date_html_files)}} dates")
+            
+            # Step 3: Program Extraction & Details
+            self.logger.info("Phase 3: Program Extraction & Details")
+            
+            program_data = await self.program_extraction(date_html_files)
+            
+            # Calculate final statistics
+            total_programs = program_data.get('total_programs', 0)
+            total_details = program_data.get('total_details', 0)
+            
+            workflow_duration = (datetime.now() - workflow_start).total_seconds()
+            
+            # Prepare final results
+            final_results = {{
+                'success': True,
+                'channel': self.channel_name,
+                'base_url': self.base_url,
+                'scraping_timestamp': datetime.now().isoformat(),
+                'workflow_duration_seconds': workflow_duration,
+                'dates_processed': len(date_html_files),
+                'programs_found': total_programs,
+                'program_details_extracted': total_details,
+                'available_dates': available_dates,
+                'program_data': program_data
+            }}
+            
+            self.logger.info(f"Workflow completed successfully in {{workflow_duration:.2f}} seconds")
+            self.logger.info(f"Results: {{len(date_html_files)}} dates, {{total_programs}} programs, {{total_details}} details")
+            
+            return final_results
+            
+        except Exception as e:
+            workflow_duration = (datetime.now() - workflow_start).total_seconds()
+            error_result = {{
+                'success': False,
+                'error': str(e),
+                'channel': self.channel_name,
+                'base_url': self.base_url,
+                'scraping_timestamp': datetime.now().isoformat(),
+                'workflow_duration_seconds': workflow_duration
+            }}
+            
+            self.logger.error(f"Workflow failed after {{workflow_duration:.2f}} seconds: {{e}}")
+            return error_result
+
+# ==================== MAIN EXECUTION ====================
+
+async def main():
+    """Main execution function for testing and production use"""
+    scraper = {{class_name}}()
+    
+    try:
+        # Run the complete workflow
+        result = await scraper.run(headless=True)
+        
+        if result['success']:
+            workflow_result = result.get('workflow_data', {{}})
+            print("✅ SCRAPING COMPLETED SUCCESSFULLY!")
+            print(f"📺 Channel: {{workflow_result.get('channel', 'Unknown')}}")
+            print(f"📅 Dates processed: {{workflow_result.get('dates_processed', 0)}}")
+            print(f"📋 Programs found: {{workflow_result.get('programs_found', 0)}}")
+            print(f"🔍 Program details: {{workflow_result.get('program_details_extracted', 0)}}")
+            print(f"⏱️  Duration: {{workflow_result.get('workflow_duration_seconds', 0):.2f}} seconds")
+            print(f"📁 Results saved to: {{result.get('results_file', 'Unknown')}}")
+        else:
+            print("❌ SCRAPING FAILED!")
+            print(f"Error: {{result.get('error', 'Unknown error')}}")
+            
+        return result
+        
+    except Exception as e:
+        print(f"❌ EXECUTION FAILED: {{str(e)}}")
+        raise
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+**ASSEMBLY INSTRUCTIONS:**
+
+1. **Insert the 3 generated method sets** in their respective sections
+2. **Ensure all methods are properly indented** within the class
+3. **Add any missing imports** that the generated methods require
+4. **Test the workflow orchestration** logic
+5. **Verify error handling** flows work correctly
+
+🚨 **CRITICAL: CODE VALIDATION & FIXING**
+
+Before generating the final code, **VALIDATE AND FIX** these common issues from the previous conversation steps:
+
+**1. PLAYWRIGHT LOCATOR SYNTAX FIXES:**
+```python
+# ❌ WRONG (causes "object Locator can't be used in 'await' expression")
+element = await self.page.locator("selector").first
+cookie_banner = await self.page.locator("#bbccookies-prompt").first
+
+# ✅ CORRECT - Always add parentheses
+element = await self.page.locator("selector").first()
+cookie_banner = await self.page.locator("#bbccookies-prompt").first()
+```
+
+**2. ELEMENT EXISTENCE CHECKS:**
+```python
+# ❌ WRONG - Can cause null reference errors
+if await element.is_visible():
+
+# ✅ CORRECT - Always check element exists first
+if element and await element.is_visible():
+```
+
+**3. SAFE ELEMENT INTERACTION PATTERN:**
+```python
+# ✅ ALWAYS USE THIS PATTERN
+try:
+    element = await self.page.locator("selector").first()
+    if element and await element.is_visible():
+        text = await element.text_content()
+        await element.click()
+except Exception as e:
+    self.logger.warning(f"Element interaction failed: {{e}}")
+```
+
+**4. MISSING IMPORTS CHECK:**
+Ensure these imports are included if used in the methods:
+- `from bs4 import BeautifulSoup` (if BeautifulSoup is used)
+- `import asyncio` (if asyncio.sleep is used)
+- `import json` (if json operations are used)
+- `from pathlib import Path` (if Path is used)
+
+**5. ASYNC/AWAIT PATTERN FIXES:**
+```python
+# ✅ CORRECT - These need await
+text = await element.text_content()
+is_visible = await element.is_visible()
+href = await element.get_attribute("href")
+await element.click()
+await element.fill("text")
+
+# ✅ CORRECT - These return awaitables
+elements = await self.page.locator("selector").all()
+count = await self.page.locator("selector").count()
+```
+
+**VALIDATION CHECKLIST:**
+- [ ] All `.first`, `.last`, `.nth()` have parentheses
+- [ ] All element interactions check `if element` first
+- [ ] All element methods use proper `await` patterns
+- [ ] All try/catch blocks have proper error handling
+- [ ] All required imports are included
+- [ ] All timeout parameters are specified (e.g., `timeout=10000`)
+
+**FINAL OUTPUT REQUIREMENTS:**
+- Complete, executable Python scraper class
+- All 3 method sets properly integrated with FIXED syntax
+- All Playwright locator issues resolved
+- Production-ready error handling and logging
+- Clean, organized data output structure
+- Comprehensive main execution block
+- Ready for daily production deployment
+
+Generate the complete, final scraper class by combining all generated methods with the workflow orchestration, ensuring ALL syntax issues are fixed.
+        
+        if channel_method == 'dropdown':
+            await self._handle_channel_dropdown()
+        elif channel_method == 'search':
+            await self._handle_channel_search()
+        elif channel_method == 'tabs':
+            await self._handle_channel_tabs()
+        else:
+            self.logger.info("No specific channel navigation method identified")
+    
+    async def _handle_channel_dropdown(self) -> None:
+        """Handle channel dropdown navigation"""
+        try:
+            # Try selectors from intelligence first, then fallbacks
+            dropdown_selectors = [
+                # From intelligence
+                # Add fallbacks
+                'select[class*="channel"]',
+                '[class*="channel"][class*="dropdown"]',
+                'button[class*="channel"]'
+            ]
+            
+            for selector in dropdown_selectors:
+                if await self.safe_click(selector):
+                    await self.wait_for_content(1000)
+                    
+                    # Look for channel option
+                    channel_option = f'option:has-text("{{self.channel_name}}")'
+                    if await self.safe_click(channel_option):
+                        self.logger.info(f"Selected channel: {{self.channel_name}}")
+                        await self.wait_for_content(2000)
+                        return
+            
+            self.logger.warning("Could not find channel dropdown")
+            
+        except Exception as e:
+            self.logger.error(f"Channel dropdown navigation failed: {{str(e)}}")
+    
+    async def _handle_channel_search(self) -> None:
+        """Handle channel search navigation"""
+        try:
+            search_selectors = [
+                'input[placeholder*="channel"]',
+                'input[class*="search"]',
+                '[data-search]'
+            ]
+            
+            for selector in search_selectors:
+                try:
+                    await self.page.wait_for_selector(selector, timeout=5000)
+                    await self.page.fill(selector, self.channel_name)
+                    await self.page.press(selector, 'Enter')
+                    await self.wait_for_content(2000)
+                    self.logger.info(f"Searched for channel: {{self.channel_name}}")
+                    return
+                except:
+                    continue
+                    
+        except Exception as e:
+            self.logger.error(f"Channel search failed: {{str(e)}}")
+    
+    async def _handle_channel_tabs(self) -> None:
+        """Handle channel tab navigation"""
+        try:
+            # Look for channel in tab format
+            tab_selectors = [
+                f'[role="tab"]:has-text("{{self.channel_name}}")',
+                f'button:has-text("{{self.channel_name}}")',
+                f'a:has-text("{{self.channel_name}}")'
+            ]
+            
+            for selector in tab_selectors:
+                if await self.safe_click(selector):
+                    self.logger.info(f"Clicked channel tab: {{self.channel_name}}")
+                    await self.wait_for_content(2000)
+                    return
+                    
+        except Exception as e:
+            self.logger.error(f"Channel tab navigation failed: {{str(e)}}")
+    
+    async def _collect_available_dates(self) -> List[str]:
+        """Collect all available dates from the site"""
+        dates = []
+        
+        try:
+            # Use intelligence date_navigation patterns
+            date_selectors = {{key_patterns}}.get('date_selectors', {{}})
+            
+            # Try selectors from intelligence first
+            date_item_selectors = [
+                # From intelligence - will be populated by actual intelligence
+                date_selectors.get('generic_date_item_selector', ''),
+                # Fallback selectors
+                '[data-date]',
+                '[class*="date"]',
+                '[class*="day"]',
+                'a[href*="date"]'
+            ]
+            
+            for selector in date_item_selectors:
+                if not selector:
+                    continue
+                    
+                try:
+                    await self.page.wait_for_selector(selector, timeout=5000)
+                    elements = await self.page.query_selector_all(selector)
+                    
+                    if elements and len(elements) > 0:
+                        for element in elements:
+                            # Extract date identifier
+                            date_id = await self._extract_date_identifier(element)
+                            if date_id and date_id not in dates:
+                                dates.append(date_id)
+                        
+                        if dates:
+                            self.logger.info(f"Found {{len(dates)}} dates using selector: {{selector}}")
+                            break
+                            
+                except Exception as e:
+                    self.logger.debug(f"Selector failed {{selector}}: {{str(e)}}")
+                    continue
+            
+            # Fallback: generate date range if no dates found
+            if not dates:
+                self.logger.warning("No dates found, generating fallback date range")
+                dates = self._generate_fallback_dates()
+            
+        except Exception as e:
+            self.logger.error(f"Date collection failed: {{str(e)}}")
+            dates = self._generate_fallback_dates()
+        
+        return dates[:7]  # Limit to 7 days for safety
+    
+    async def _extract_date_identifier(self, element) -> Optional[str]:
+        """Extract date identifier from element"""
+        try:
+            # Try different extraction methods
+            methods = [
+                lambda el: el.get_attribute('data-date'),
+                lambda el: el.get_attribute('data-day'),
+                lambda el: el.get_attribute('href'),
+                lambda el: el.text_content()
+            ]
+            
+            for method in methods:
+                try:
+                    result = await method(element)
+                    if result and result.strip():
+                        return result.strip()
+                except:
+                    continue
+            
+            return None
+            
+        except Exception:
+            return None
+    
+    def _generate_fallback_dates(self) -> List[str]:
+        """Generate fallback date range"""
+        from datetime import datetime, timedelta
+        
+        dates = []
+        base_date = datetime.now()
+        
+        for i in range(7):  # 7 days
+            date = base_date + timedelta(days=i)
+            dates.append(date.strftime('%Y-%m-%d'))
+        
+        return dates
+    
+    async def _collect_date_data(self, date_id: str) -> None:
+        """Navigate to specific date and collect data"""
+        try:
+            self.logger.info(f"Collecting data for date: {{date_id}}")
+            
+            # Navigate to date using intelligence patterns
+            navigation_pattern = {{key_patterns}}.get('date_navigation_pattern', 'STATIC')
+            
+            if navigation_pattern == 'URL_CHANGE':
+                success = await self._navigate_to_date_by_url(date_id)
+            elif navigation_pattern == 'AJAX':
+                success = await self._navigate_to_date_by_click(date_id)
+            else:
+                success = True  # Static site, no navigation needed
+            
+            if success:
+                # Store page data
+                self.store_page_data(date_id, 'dates')
+                self.logger.info(f"Successfully collected data for date: {{date_id}}")
+            else:
+                self.logger.warning(f"Failed to navigate to date: {{date_id}}")
+                
+        except Exception as e:
+            self.logger.error(f"Date collection failed for {{date_id}}: {{str(e)}}")
+            self.errors.append(f"Date {{date_id}}: {{str(e)}}")
+    
+    async def _navigate_to_date_by_url(self, date_id: str) -> bool:
+        """Navigate to date using URL pattern"""
+        try:
+            # Use URL pattern from intelligence
+            current_url = self.get_current_url()
+            
+            # Simple URL construction - can be enhanced based on intelligence
+            if '?' in current_url:
+                target_url = f"{{current_url}}&date={{date_id}}"
+            else:
+                target_url = f"{{current_url}}?date={{date_id}}"
+            
+            return await self.safe_navigate(target_url)
+            
+        except Exception as e:
+            self.logger.error(f"URL navigation failed: {{str(e)}}")
+            return False
+    
+    async def _navigate_to_date_by_click(self, date_id: str) -> bool:
+        """Navigate to date by clicking date element"""
+        try:
+            # Find and click date element
+            date_selectors = [
+                f'[data-date="{{date_id}}"]',
+                f'[href*="{{date_id}}"]',
+                f'text="{{date_id}}"'
+            ]
+            
+            for selector in date_selectors:
+                if await self.safe_click(selector):
+                    await self.wait_for_content(3000)
+                    return True
+            
+            return False
+            
+        except Exception as e:
+            self.logger.error(f"Click navigation failed: {{str(e)}}")
+            return False
+    
+    async def _parse_collected_data(self) -> None:
+        """Parse all collected data"""
+        try:
+            self.logger.info("Parsing collected data...")
+            
+            parsed_results = {{}}
+            
+            # Parse each date's data
+            for date_id, date_data in self.collected_data.get('dates', {{}}).items():
+                programs = await self._parse_date_programs(date_id, date_data)
+                if programs:
+                    parsed_results[date_id] = programs
+                    self.stats['programs'] += len(programs)
+            
+            # Store parsed results
+            self.collected_data['parsed_programs'] = parsed_results
+            
+            self.logger.info(f"Parsing complete. Found {{self.stats['programs']}} total programs")
+            
+        except Exception as e:
+            self.logger.error(f"Parsing failed: {{str(e)}}")
+            self.errors.append(f"Parsing error: {{str(e)}}")
+    
+    async def _parse_date_programs(self, date_id: str, date_data: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Parse programs from a single date's data"""
+        programs = []
+        
+        try:
+            # This would typically parse HTML content stored in date_data
+            # For now, return basic structure
+            programs.append({{
+                'date': date_id,
+                'title': 'Sample Program',
+                'time': '20:00',
+                'description': 'Sample description'
+            }})
+            
+        except Exception as e:
+            self.logger.error(f"Failed to parse programs for {{date_id}}: {{str(e)}}")
+        
+        return programs
+
+# Main execution
+async def main():
+    scraper = {class_name}()
+    try:
+        result = await scraper.run(headless=True)
+        
+        if result['success']:
+            print("✅ Scraping completed successfully!")
+            print(f"📅 Dates processed: {{result['stats']['dates']}}")
+            print(f"📺 Programs found: {{result['stats']['programs']}}")
+        else:
+            print(f"❌ Scraping failed: {{result.get('error', 'Unknown error')}}")
+            
+        return result
+        
+    except Exception as e:
+        print(f"❌ Scraping failed: {{str(e)}}")
+        raise
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+IMPLEMENTATION GUIDELINES:
+
+1. **Use Intelligence Wisely**: Extract patterns from intelligence but have fallback strategies
+2. **Error Handling**: Wrap each major operation in try/except, log errors but continue
+3. **Fallback Strategies**: Always have backup selectors and approaches
+4. **Clean Code**: Small methods, clear names, helpful comments
+5. **Robust Navigation**: Handle different navigation patterns (URL, AJAX, static)
+6. **Data Validation**: Check if data extraction worked before proceeding
+
+Generate ONLY the complete Python scraper class. Use the intelligence patterns where available, but include sensible fallbacks. Make the code robust and maintainable.
