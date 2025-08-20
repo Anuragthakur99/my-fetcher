@@ -1,0 +1,49 @@
+{
+  "job_id": "job_001",
+  "channel_number": 121,
+  "source_type": "sftp",
+    "ftp": {
+      "connection": {
+        "protocol": "sftp",
+        "host": "ftp1.tmstv.com",
+        "port": 22,
+        "auth": {
+          "username": "amgsptin",
+          "password": "244in560"
+        }
+      },
+  
+      "scope": {
+        "path": "/BBC Studios/",
+        "recursive": false
+      },
+  
+      "file_select": {
+        "include": {
+          "patterns": ["TGDEU.*\\.xml"],
+          "extensions": ["xml"],
+          "case_sensitive": false
+        },
+        "exclude": {
+          "patterns": ["HISTDE.*\\.xml"],
+          "folders": ["TRAVDE","FOODDE"],
+          "skip_subfolders": false
+        }
+      },
+  
+      "sorting": {
+        "by": "date_in_filename",
+        "descending": true,
+        "date_format": "%Y-%m-%d"
+      },
+  
+      "date_window": {
+          "range": "T+5"
+      },
+      "file_examples" : [],
+      "post_fetch": {
+        "rename_after_fetch": true,
+        "rename_template": "Fetched"
+      }
+    }
+  }

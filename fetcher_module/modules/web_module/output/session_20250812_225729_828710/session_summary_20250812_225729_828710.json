@@ -1,0 +1,23 @@
+{
+  "session_id": "20250812_225729_828710",
+  "created_at": "2025-08-12T23:01:10.325244",
+  "version": "1.0",
+  "browser_use_version": "0.5.5",
+  "timestamp": "20250812_225729_828710",
+  "session_duration": "2025-08-12T23:01:10.325232",
+  "tasks_completed": 1,
+  "har_recording_mode": "global_traditional",
+  "har_recording_summary": {
+    "recording_mode": "global_traditional",
+    "har_file_path": "/Users/bab2402/PycharmProjects/fetcher_module/modules/web_module/output/session_20250812_225729_828710/network_traffic_20250812_225729_828710.har",
+    "message": "HAR file created automatically by browser-use"
+  },
+  "tasks_summary": {
+    "task_0_login_authentication": {
+      "success": false,
+      "timestamp": "2025-08-12T22:57:43.685943",
+      "directory": "/Users/bab2402/PycharmProjects/fetcher_module/modules/web_module/output/session_20250812_225729_828710/task_0_login_authentication",
+      "har_file": "Not created due to error"
+    }
+  }
+}

@@ -1,0 +1,1 @@
+# FTP Module exceptions

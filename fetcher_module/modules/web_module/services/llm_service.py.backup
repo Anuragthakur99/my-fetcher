@@ -1,0 +1,235 @@
+"""AWS Bedrock LLM service for TV Schedule Analyzer"""
+
+import boto3
+from typing import List, Optional
+from langchain_aws import ChatBedrockConverse
+from langchain_core.messages import BaseMessage
+from browser_use.llm import ChatAWSBedrock, ChatAnthropicBedrock
+from ..utils.config import config
+from ..utils.logger import setup_logger
+
+class LLMService:
+    """AWS Bedrock LLM service using Claude models"""
+    
+    def __init__(self, session_id: str = None):
+        self.logger = setup_logger(f"llm_service_{session_id}" if session_id else "llm_service", session_id)
+        self._default_llm = None
+        self._browser_use_llm = None
+        self._boto3_session = None
+        self._initialize_default_llm()
+        self._initialize_boto3_session()
+    
+    def _initialize_boto3_session(self):
+        """Initialize boto3 session for browser-use LLM"""
+        try:
+            self._boto3_session = boto3.Session(profile_name=config.aws_profile)
+            self.logger.debug("Initialized boto3 session for browser-use LLM")
+        except Exception as e:
+            self.logger.error(f"Failed to initialize boto3 session: {str(e)}")
+            raise
+    
+    def _initialize_default_llm(self):
+        """Initialize default AWS Bedrock LLM with config parameters"""
+        try:
+            session = boto3.Session(profile_name=config.aws_profile)
+            
+            # Configure client with extended timeout for long code generation
+            from botocore.config import Config
+            bedrock_config = Config(
+                read_timeout=600,  # 10 minutes read timeout
+                connect_timeout=60,  # 1 minute connect timeout
+                retries={'max_attempts': 3}
+            )
+            
+            bedrock_client = session.client(
+                service_name='bedrock-runtime', 
+                region_name=config.aws_region,
+                config=bedrock_config
+            )
+            
+            self._default_llm = ChatBedrockConverse(
+                model=config.bedrock_model_id,
+                provider="anthropic",
+                client=bedrock_client,
+                temperature=config.llm_temperature,
+                max_tokens=config.llm_max_tokens,
+                top_p=config.llm_top_p,
+                disable_streaming=False
+            )
+            
+            self.logger.info(f"Initialized Bedrock LLM - Model: {config.bedrock_model_id}")
+            self.logger.info(f"Default Parameters - Temperature: {config.llm_temperature}, Max Tokens: {config.llm_max_tokens}, Top P: {config.llm_top_p}")
+            
+        except Exception as e:
+            self.logger.error(f"Failed to initialize Bedrock LLM: {str(e)}")
+            raise
+    
+    def create_browser_use_llm(
+        self,
+        model: Optional[str] = None,
+        max_tokens: Optional[int] = None,
+        temperature: Optional[float] = None,
+        top_p: Optional[float] = None,
+        stop_sequences: Optional[List[str]] = None
+    ) -> ChatAnthropicBedrock:
+        """
+        Create browser-use compatible ChatAWSBedrock instance
+        
+        This method creates a browser-use native LLM that's fully compatible
+        with browser-use 0.5.5 without requiring monkey patches.
+        
+        Args:
+            model: Model ID (uses config default if None)
+            max_tokens: Maximum tokens (uses config default if None)
+            temperature: Temperature (uses config default if None)
+            top_p: Top P (uses config default if None)
+            stop_sequences: Stop sequences (optional)
+            
+        Returns:
+            ChatAWSBedrock: browser-use compatible LLM instance
+        """
+        try:
+            # Use config defaults if parameters not specified
+            model_id = model or config.bedrock_model_id
+            max_tokens_val = max_tokens or config.llm_max_tokens
+            temperature_val = temperature if temperature is not None else config.llm_temperature
+            top_p_val = top_p if top_p is not None else config.llm_top_p
+            
+            # Create browser-use ChatAWSBedrock with boto3 session
+            browser_llm = ChatAnthropicBedrock(
+                model=model_id,
+                max_tokens=max_tokens_val,
+                temperature=temperature_val,
+                top_p=top_p_val,
+                stop_sequences=stop_sequences,
+                session=self._boto3_session,  # Pass boto3 session for credentials
+                aws_region=config.aws_region  # Explicit region
+                # stream=True
+            )
+            
+            self.logger.info(f"Created browser-use ChatAWSBedrock - Model: {model_id}")
+            self.logger.info(f"Browser-use LLM Parameters - Temperature: {temperature_val}, Max Tokens: {max_tokens_val}, Top P: {top_p_val}")
+            
+            return browser_llm
+            
+        except Exception as e:
+            self.logger.error(f"Failed to create browser-use LLM: {str(e)}")
+            raise
+    
+    @property
+    def browser_use_llm(self) -> ChatAnthropicBedrock:
+        """
+        Get cached browser-use LLM instance with default parameters
+        
+        Returns:
+            ChatAWSBedrock: Cached browser-use compatible LLM
+        """
+        if self._browser_use_llm is None:
+            self._browser_use_llm = self.create_browser_use_llm()
+        return self._browser_use_llm
+    
+    def stream_response(
+        self, 
+        messages: List[BaseMessage],
+        temperature: Optional[float] = None,
+        max_tokens: Optional[int] = None,
+        top_p: Optional[float] = None,
+        print_response: bool = True
+    ) -> str:
+        """
+        Stream response from LLM and return complete response
+        
+        Args:
+            messages: List of messages (SystemMessage, HumanMessage, etc.)
+            temperature: Override temperature (uses config default if None)
+            max_tokens: Override max tokens (uses config default if None) 
+            top_p: Override top_p (uses config default if None)
+            print_response: Whether to print response chunks as they stream
+            
+        Returns:
+            str: Complete generated response
+        """
+        try:
+            self.logger.debug(f"Streaming LLM response with {len(messages)} messages")
+            
+            # Get LLM with specified parameters
+            llm = self._get_llm(temperature, max_tokens, top_p)
+            
+            # Stream response and collect chunks
+            total_content = ""
+            chunk_count = 0
+            
+            for chunk in llm.stream(messages):
+                # Handle Bedrock's different response format
+                if isinstance(chunk.content, list):
+                    # Extract text from list format (Bedrock Claude 4 format)
+                    chunk_content = ""
+                    for content_item in chunk.content:
+                        if isinstance(content_item, dict) and content_item.get('type') == 'text':
+                            chunk_content += content_item.get('text', '')
+                        elif isinstance(content_item, str):
+                            chunk_content += content_item
+                else:
+                    # Handle string format (other providers)
+                    chunk_content = chunk.content if chunk.content else ""
+
+                total_content += chunk_content
+                chunk_count += 1
+
+                # Print chunk if there's actual content and printing is enabled
+                if chunk_content and print_response:
+                    print(chunk_content, end='', flush=True)
+            
+            if print_response and total_content:
+                print()  # New line after streaming
+            
+            self.logger.debug(f"Completed streaming response with {len(total_content)} characters in {chunk_count} chunks")
+            return total_content
+            
+        except Exception as e:
+            self.logger.error(f"Failed to stream LLM response: {str(e)}")
+            raise
+    
+    def _get_llm(
+        self, 
+        temperature: Optional[float] = None,
+        max_tokens: Optional[int] = None,
+        top_p: Optional[float] = None
+    ) -> ChatBedrockConverse:
+        """Get LLM instance with specified parameters"""
+        
+        # Use default LLM if no custom parameters
+        if temperature is None and max_tokens is None and top_p is None:
+            return self._default_llm
+        
+        # Create custom LLM with specified parameters and extended timeout
+        session = boto3.Session(profile_name=config.aws_profile)
+        
+        # Configure client with extended timeout for long code generation
+        from botocore.config import Config
+        bedrock_config = Config(
+            read_timeout=600,  # 10 minutes read timeout
+            connect_timeout=60,  # 1 minute connect timeout
+            retries={'max_attempts': 3}
+        )
+        
+        bedrock_client = session.client(
+            service_name='bedrock-runtime', 
+            region_name=config.aws_region,
+            config=bedrock_config  # Apply extended timeout configuration
+        )
+        
+        return ChatBedrockConverse(
+            model=config.bedrock_model_id,
+            provider="anthropic",
+            client=bedrock_client,
+            temperature=temperature if temperature is not None else config.llm_temperature,
+            max_tokens=max_tokens if max_tokens is not None else config.llm_max_tokens,
+            top_p=top_p if top_p is not None else config.llm_top_p,
+            disable_streaming=False
+        )
+    
+    @property
+    def default_llm(self) -> ChatBedrockConverse:
+        """Get the default LLM instance for direct use"""
+        return self._default_llm
